@@ -23,11 +23,11 @@ private:
 	std::vector<std::vector<int>> adjListG, adjListT, subtrees, subtreesContainingU;
 	std::vector<int> sizeFrequenciesOfMaximalCliques;
 
-	void generate(void);
 	int newNode(void);
 
 public:
 	Chordal(int n, double densityMult = 1);
+	void generate(void);
 	void writeGraphToFile(std::string fileName);
 	void collectAndWriteStats(std::string fileName, std::string instanceInfoCSVFileName, std::string cliqueSizeInfoCSVFileName);
 	double getDensity() {return density;}

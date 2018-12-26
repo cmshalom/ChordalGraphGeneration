@@ -25,7 +25,6 @@ void Chordal::generate(void) {
 	lastNodeID = -1;
 	numSubtrees = 0;
 	adjListG.resize(n);
-	subtrees.resize(n);
 	adjListT.reserve(n);
 	subtreesContainingU.reserve(n);
 	sizeFrequenciesOfMaximalCliques.reserve(n);
@@ -33,6 +32,7 @@ void Chordal::generate(void) {
 	int numNewSubtrees = newNode();
 	while (numSubtrees < n) {
 		int selectedNodeID = rand() % adjListT.size(); //selected node is node u
+		                                               // OYLUM random int icin bir fonksyon
 		numNewSubtrees = newNode();                    //new node is node v
 		adjListT.back().emplace_back(selectedNodeID);
 		adjListT.at(selectedNodeID).emplace_back(lastNodeID);
@@ -54,7 +54,6 @@ void Chordal::generate(void) {
 			numConnComps++;
 		for (vector<int>::iterator it = subtreeIDsInProperSubset.begin(); it!= subtreeIDsInProperSubset.end(); ++it) {
 			int subtreeID = *it;
-			subtrees.at(subtreeID).emplace_back(lastNodeID);
 			subtreesContainingU.back().emplace_back(subtreeID);
 			for (int j = numSubtrees - numNewSubtrees; j < numSubtrees; ++j) {
 				adjListG.at(subtreeID).emplace_back(j);
@@ -71,23 +70,21 @@ void Chordal::generate(void) {
 int Chordal::newNode(void) {
 	lastNodeID++;
 	adjListT.resize(lastNodeID + 1);
+	subtreesContainingU.resize(lastNodeID + 1);
 	/*
 	//either pick an integer between 1 and n-_numSubtrees
 	int k = rand() % (_n - _numSubtrees) + 1;
 	*/
 	//or decrease the upper bound to guide the density (when _densityMult=1, this becomes equivalent to the one above)
-	int k = rand() % (max(1, int( (n - numSubtrees)*this->densityMult + 0.5 ))) + 1;
-	for (int i = numSubtrees; i < numSubtrees + k; ++i) subtrees.at(i).emplace_back(lastNodeID);
-	for (int i = numSubtrees; i < numSubtrees + k; ++i) {
-		for (int j = numSubtrees; j < numSubtrees + k; ++j) {
-			if (i != j)	adjListG.at(i).emplace_back(j);
+	int k = rand() % (max(1, int( (n - numSubtrees)*densityMult + 0.5 ))) + 1;
+	for (int i = numSubtrees; i < numSubtrees + k; i++) {
+		for (int j = numSubtrees; j < numSubtrees + k; j++) {
+			if (i != j)	adjListG[i].emplace_back(j);
 		}
 	}
 	numEdges += k*(k - 1) / 2;
 
 	//update the set of subtrees containing u
-	int currentSize = subtreesContainingU.size();
-	subtreesContainingU.resize(currentSize + 1); //last index of _subtreesContainingU corresponds to the new node v
 	for (int i = numSubtrees; i < numSubtrees + k; ++i)
 		subtreesContainingU.back().emplace_back(i);
 	numSubtrees += k;
