@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <string>
+#include <iostream>
 
 class Chordal {
 private:
@@ -31,6 +32,9 @@ public:
 	void collectAndWriteStats(std::string fileName, std::string instanceInfoCSVFileName, std::string cliqueSizeInfoCSVFileName);
 	double getDensity() {return density;}
 	int getNumberOfVertices() {return n;}
+
+    friend	std::ostream& operator<<(std::ostream &out, const Chordal& chordal);
+
 };
 
 #endif /* CHORDAL_H_ */

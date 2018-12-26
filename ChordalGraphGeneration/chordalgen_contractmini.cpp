@@ -2,11 +2,18 @@
 #include <string>
 #include <fstream>
 #include <random>
+#include "Seeder.h"
+#include "Chordal.h"
+
+#ifdef WINDOWS
+#include <windows.h>
+#include <direct.h>
+#define mkdir _mkdir
+#else
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include "Seeder.h"
-#include "Chordal.h"
+#endif
 
 #define SEED_FILE_NAME "seed.txt"
 #define INSTANCE_INFO_FILE_NAME "instance_info.csv"
@@ -25,7 +32,7 @@ double densityMult; 	    // Parameter #4: Density multiplier, which is an option
 
 static void readArguments(int argc, char ** argv) {
 	if (argc < 4 || argc > 5) {
-		cerr << "Invalid number of arguments" << argc << endl;
+		cerr << "Usage:" << argv[0] << "number_of_vertices desired_density graph_index [density_multiplier]" << endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -77,7 +84,10 @@ int main(int argc, char ** argv)
 			inputDir = inputDir + "avg density " + argv[2] + DIRECTORY_SEPARATOR;
 			mkdir(inputDir.c_str(), 0777);
 			string fileName = inputDir + "chordalgr_" + argv[1] + "_" + graphIndex + ".txt";
-			chg.writeGraphToFile(fileName);			
+			ofstream file;
+			file.open(fileName, ios::out | ios::ate | ios::trunc);
+            file << chg;
+            file.close();
 			/************************************************************************************************/
 
 			/************************************************************************************************/

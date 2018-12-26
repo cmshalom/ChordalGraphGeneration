@@ -94,15 +94,14 @@ int Chordal::newNode(void) {
 	return k;
 }
 
-void Chordal::writeGraphToFile(string fileName) {
-	ofstream file;
-	file.open(fileName, ios::out | ios::ate | ios::trunc);
-	file << n << endl;
-	for (unsigned int i = 0; i < adjListG.size(); ++i) {
-		file << adjListG.at(i).size() << " ";
-		for (unsigned int j = 0; j < adjListG.at(i).size(); ++j) file << adjListG.at(i).at(j) << " ";
-		file << endl;
+ostream& operator<<(ostream &out, const Chordal& chordal) {
+	out << chordal.n << endl;
+	for (unsigned int i = 0; i < chordal.adjListG.size(); i++) {
+		out << chordal.adjListG.at(i).size() << " ";
+		for (unsigned int j = 0; j < chordal.adjListG.at(i).size(); j++) out << chordal.adjListG.at(i).at(j) << " ";
+		out << endl;
 	}
+	return out;
 }
 
 void Chordal::collectAndWriteStats(string fileName, string instanceInfoCSVFileName, string cliqueSizeInfoCSVFileName) {
