@@ -8,7 +8,7 @@
 #ifdef WINDOWS
 #include <windows.h>
 #include <direct.h>
-#define mkdir _mkdir
+#define mkdir(a,b) _mkdir(a)
 #else
 #include <unistd.h>
 #include <sys/stat.h>
