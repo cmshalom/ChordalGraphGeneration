@@ -75,7 +75,10 @@ int main(int argc, char ** argv) {
 	rp.seedRand();
 
 	Chordal chg (n, densityMult);
-	while (abs(chg.getDensity() - desiredDensity) > densityEps) chg.generate();
+	while (abs(chg.getDensity() - desiredDensity) > densityEps) {
+		cerr << "Bad density: " << chg.getDensity() << " instead of " << desiredDensity << endl;
+		chg.generate();
+	}
 
 	// WRITE THE CHORDAL GRAPH TO FILE
 	string inputDir = to_string(n) + DIRECTORY_SEPARATOR;
