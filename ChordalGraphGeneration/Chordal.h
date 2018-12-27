@@ -12,18 +12,24 @@
 #include <string>
 #include <iostream>
 
+#include "Stats.h"
+
 class Chordal {
 private:
-	int numSubtrees, lastNodeID, numEdges, n;
-	unsigned int numMaximalCliques, minCliqueSize, maxCliqueSize, numConnComps = 1;
-	double densityMult, avgCliqueSize, stDevOfCliqueSizes;
+	// Data initialized by c'tors
+	unsigned int n;
+	double densityMult;
+
+	// Data computed by generate()
+	int lastNodeID;
+	unsigned int numSubtrees, numEdges, numConnComps;
 	double timeToBuild;
+	std::vector<std::vector<int>> adjListG, subtreesContaining;
 	double density;
 
-	std::vector<std::vector<int>> adjListG, adjListT, subtrees, subtreesContainingU;
-	std::vector<int> sizeFrequenciesOfMaximalCliques;
-
 	int newNode(void);
+	void addTreeEdge(int parent, int child);
+
 
 public:
 	Chordal(int n, double densityMult = 1);
@@ -32,8 +38,9 @@ public:
 	void collectAndWriteStats(std::string fileName, std::string instanceInfoCSVFileName, std::string cliqueSizeInfoCSVFileName);
 	double getDensity() {return density;}
 	int getNumberOfVertices() {return n;}
+	Stats *getCliqueStatistics();
 
-    friend	std::ostream& operator<<(std::ostream &out, const Chordal& chordal);
+    friend	std::ostream& operator<<(std::ostream &, const Chordal&);
 
 };
 

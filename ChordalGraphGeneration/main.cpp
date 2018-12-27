@@ -64,8 +64,8 @@ static void readArguments(int argc, char ** argv) {
 	}
 }
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char ** argv) {
+
     readArguments(argc, argv);
 	
 	double densityEps = desiredDensity*EPSILON; //densityEps is the accepted maximum absolute deviation from the desired density value
@@ -76,8 +76,8 @@ int main(int argc, char ** argv)
 
 	Chordal chg (n, densityMult);
 	while (abs(chg.getDensity() - desiredDensity) > densityEps) chg.generate();
-	/************************************************************************************************/
-	//TO WRITE THE CHORDAL GRAPH TO FILE
+
+	// WRITE THE CHORDAL GRAPH TO FILE
 	string inputDir = to_string(n) + DIRECTORY_SEPARATOR;
 	mkdir(inputDir.c_str(), 0777);
     inputDir = inputDir + "avg density " + argv[2] + DIRECTORY_SEPARATOR;
@@ -87,13 +87,9 @@ int main(int argc, char ** argv)
 	file.open(fileName, ios::out | ios::ate | ios::trunc);
     file << chg;
     file.close();
-	/************************************************************************************************/
 
-	/************************************************************************************************/
-    //TO CALCULATE AND WRITE THE STATS OF THE CHORDAL GRAPH TO FILE
 	chg.collectAndWriteStats(fileName, INSTANCE_INFO_FILE_NAME, CLIQUE_SIZE_INFO_FILE_NAME);
-	/************************************************************************************************/
 			
-	cout << "n = " << chg.getNumberOfVertices() << endl;  // OYLUM n ile chg.n birbirinden farkli olabilir mi ?
+	cout << "n = " << n << endl;
 	cout << "Density = " << chg.getDensity() << endl << endl;
 }

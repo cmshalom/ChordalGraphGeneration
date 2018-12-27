@@ -22,115 +22,112 @@ Chordal::Chordal(int n, double densityMult) {
 
 void Chordal::generate(void) {
 	clock_t start = clock();
+
 	lastNodeID = -1;
 	numSubtrees = 0;
+	numEdges = 0;
+	numConnComps = 1;
+	// TODO: Clean Data Structures from previous invocation (if any)
 	adjListG.resize(n);
-	adjListT.reserve(n);
-	subtreesContainingU.reserve(n);
-	sizeFrequenciesOfMaximalCliques.reserve(n);
+	subtreesContaining.reserve(n);
 
-	int numNewSubtrees = newNode();
+	newNode();
 	while (numSubtrees < n) {
-		int selectedNodeID = rand() % adjListT.size(); //selected node is node u
-		                                               // OYLUM random int icin bir fonksyon
-		numNewSubtrees = newNode();                    //new node is node v
-		adjListT.back().emplace_back(selectedNodeID);
-		adjListT.at(selectedNodeID).emplace_back(lastNodeID);
-		//select a proper subset
-		vector<int> subtreeIDsInProperSubset;
-		subtreeIDsInProperSubset.reserve(subtreesContainingU.at(selectedNodeID).size());
-		while (true) {
-			subtreeIDsInProperSubset.clear();
-			for (unsigned int i = 0; i < subtreesContainingU.at(selectedNodeID).size(); ++i) {
-				double randomNo = double(rand()) / RAND_MAX;
-				if (randomNo < 0.5)
-					subtreeIDsInProperSubset.emplace_back(subtreesContainingU.at(selectedNodeID).at(i));
-			}
-			if (subtreeIDsInProperSubset.size() < subtreesContainingU.at(selectedNodeID).size() - 0.5)
-				break;
-		}
-		int properSubsetSize = subtreeIDsInProperSubset.size();
-		if (properSubsetSize < 0.1) //if the selected proper subset is empty
-			numConnComps++;
-		for (vector<int>::iterator it = subtreeIDsInProperSubset.begin(); it!= subtreeIDsInProperSubset.end(); ++it) {
-			int subtreeID = *it;
-			subtreesContainingU.back().emplace_back(subtreeID);
-			for (int j = numSubtrees - numNewSubtrees; j < numSubtrees; ++j) {
-				adjListG.at(subtreeID).emplace_back(j);
-				adjListG.at(j).emplace_back(subtreeID);
-			}
-		}
-		numEdges += numNewSubtrees*properSubsetSize;
+		int u = rand() % (lastNodeID+1);
+		newNode();
+		addTreeEdge(u, lastNodeID);
 	}
 	density = double(numEdges) / (n*(n - 1) / 2);
+
 	clock_t end = clock();
 	timeToBuild = double(end - start) / 1000;
 }
 
 int Chordal::newNode(void) {
 	lastNodeID++;
-	adjListT.resize(lastNodeID + 1);
-	subtreesContainingU.resize(lastNodeID + 1);
-	/*
-	//either pick an integer between 1 and n-_numSubtrees
-	int k = rand() % (_n - _numSubtrees) + 1;
-	*/
-	//or decrease the upper bound to guide the density (when _densityMult=1, this becomes equivalent to the one above)
+	// Note that when densityMult=1 the below becomes
+	// int k = rand() % (n - numSubtrees) + 1;
 	int k = rand() % (max(1, int( (n - numSubtrees)*densityMult + 0.5 ))) + 1;
-	for (int i = numSubtrees; i < numSubtrees + k; i++) {
-		for (int j = numSubtrees; j < numSubtrees + k; j++) {
-			if (i != j)	adjListG[i].emplace_back(j);
+
+	//update the set of subtrees containing u
+	subtreesContaining.resize(lastNodeID+1);
+	for (int i = 0; i < k; i++)
+		subtreesContaining.back().emplace_back(numSubtrees + i);
+
+	for (int i = 0; i < k; i++) {
+		for (int j = 0; j < k; j++) {
+			if (i != j)	adjListG[numSubtrees + i].emplace_back(numSubtrees+j);
 		}
 	}
 	numEdges += k*(k - 1) / 2;
 
-	//update the set of subtrees containing u
-	for (int i = numSubtrees; i < numSubtrees + k; ++i)
-		subtreesContainingU.back().emplace_back(i);
 	numSubtrees += k;
 	return k;
+}
+
+void Chordal::addTreeEdge(int u, int v) {
+	// Select a proper subset of the subtrees of u
+	vector<int> properSubset;
+	properSubset.reserve(subtreesContaining[u].size());
+	do {
+		properSubset.clear();
+		for (unsigned int i = 0; i < subtreesContaining[u].size(); i++) {
+			if (rand() % 2 == 0) properSubset.emplace_back(subtreesContaining[u][i]);
+		}
+
+	} while (properSubset.size() == subtreesContaining[u].size());
+
+	if (properSubset.size() == 0) numConnComps++;
+
+	// Extend every subtree of the proper subset to v
+	int vSubtrees = subtreesContaining[v].size();
+	for (unsigned int i = 0; i < properSubset.size(); i++) {
+		int treeFromU = properSubset[i];
+		subtreesContaining[v].push_back(treeFromU);
+		for (unsigned int treeFromV = numSubtrees - vSubtrees; treeFromV < numSubtrees; treeFromV++) {
+			adjListG[treeFromU].emplace_back(treeFromV);
+			adjListG[treeFromV].emplace_back(treeFromU);
+		}
+	}
+	numEdges += vSubtrees*properSubset.size();
 }
 
 ostream& operator<<(ostream &out, const Chordal& chordal) {
 	out << chordal.n << endl;
 	for (unsigned int i = 0; i < chordal.adjListG.size(); i++) {
-		out << chordal.adjListG.at(i).size() << " ";
-		for (unsigned int j = 0; j < chordal.adjListG.at(i).size(); j++) out << chordal.adjListG.at(i).at(j) << " ";
+		out << chordal.adjListG[i].size() << " ";
+		for (unsigned int j = 0; j < chordal.adjListG[i].size(); j++) out << chordal.adjListG[i][j] << " ";
 		out << endl;
 	}
 	return out;
 }
 
-void Chordal::collectAndWriteStats(string fileName, string instanceInfoCSVFileName, string cliqueSizeInfoCSVFileName) {
-	//collect stats
-	numMaximalCliques = subtreesContainingU.size();
-	long long int sumSquaredSizes = 0;
-	minCliqueSize = n + 1; maxCliqueSize = 0; avgCliqueSize = 0;
-	for (vector<vector<int>>::const_iterator cit = subtreesContainingU.begin(); cit != subtreesContainingU.end(); ++cit) {
-		unsigned int cliqueSize = (*cit).size();
-		avgCliqueSize += cliqueSize;
-		if (cliqueSize < minCliqueSize) minCliqueSize = cliqueSize;
-		if (cliqueSize > maxCliqueSize) maxCliqueSize = cliqueSize;
-		sumSquaredSizes += cliqueSize*cliqueSize;
-		if (sizeFrequenciesOfMaximalCliques.size() < cliqueSize) {
-			sizeFrequenciesOfMaximalCliques.resize(cliqueSize); // so that (cliqueSize-1)^th entry is guaranteed to exist (resize equates the newly added entries to zero)
-		}
-		sizeFrequenciesOfMaximalCliques.at(cliqueSize-1)++;
-	}
-	avgCliqueSize = double(avgCliqueSize) / numMaximalCliques;
-	double variance = (1 / double((numMaximalCliques - 1)))*(sumSquaredSizes - numMaximalCliques*avgCliqueSize*avgCliqueSize);
-	stDevOfCliqueSizes = sqrt(variance);
+Stats *Chordal::getCliqueStatistics() {
+	Stats *ret = new Stats(1,n);
 
-	//write stats to file
+	for (unsigned int v = 0; v < subtreesContaining.size(); v++) {
+		ret->addSample(subtreesContaining[v].size());
+	}
+    return ret;
+}
+
+
+void Chordal::collectAndWriteStats(string fileName, string instanceInfoCSVFileName, string cliqueSizeInfoCSVFileName) {
+	Stats *stats = getCliqueStatistics();
+
 	ofstream file;
 	file.open(instanceInfoCSVFileName, ios::out | ios::ate | ios::app);
-	file << fileName << "," << n << "," << density << "," << this->densityMult << ","
-		<< numConnComps << "," << numMaximalCliques << "," << minCliqueSize << "," << maxCliqueSize << "," << avgCliqueSize << "," << stDevOfCliqueSizes << ","
-		<< timeToBuild << endl;
+
+	file << fileName << "," << n << "," << density << "," << densityMult << ","
+		<< numConnComps << "," << stats << "," << timeToBuild << endl;
+	file.close();
+
 	ofstream file2;
 	file2.open(cliqueSizeInfoCSVFileName, ios::out | ios::ate | ios::app);
-	for (unsigned int i = 0; i < sizeFrequenciesOfMaximalCliques.size(); ++i) {
-		file2 << sizeFrequenciesOfMaximalCliques.at(i) << ",";
+	for (int i = 0; i < stats->getMax(); i++) {
+		file2 << stats->getFrequency(i) << ",";
 	}
 	file2 << endl;
+	file2.close();
+	delete stats;
 }
