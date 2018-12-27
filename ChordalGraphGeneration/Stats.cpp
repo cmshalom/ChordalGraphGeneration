@@ -18,7 +18,7 @@ Stats::Stats(int lowerBound, int upperBound) {
 	sum = 0;
 	count = 0;
 	sumSquares = 0;
-	frequencies.reserve(lowerBound-upperBound+1);
+	frequencies.reserve(upperBound-lowerBound+1);
 }
 
 Stats::~Stats() {

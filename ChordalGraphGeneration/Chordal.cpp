@@ -27,7 +27,8 @@ void Chordal::generate(void) {
 	numSubtrees = 0;
 	numEdges = 0;
 	numConnComps = 1;
-	// TODO: Clean Data Structures from previous invocation (if any)
+	adjListG.clear();
+	subtreesContaining.clear();
 	adjListG.resize(n);
 	subtreesContaining.reserve(n);
 
