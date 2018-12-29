@@ -9,16 +9,17 @@
 #include <windows.h>
 #include <direct.h>
 #define mkdir(a,b) _mkdir(a)
+#define DIRECTORY_SEPARATOR "\\"
 #else
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#define DIRECTORY_SEPARATOR "/"
 #endif
 
 #define SEED_FILE_NAME "seed.txt"
 #define INSTANCE_INFO_FILE_NAME "instance_info.csv"
 #define CLIQUE_SIZE_INFO_FILE_NAME	"clique_size_frequencies.csv"
-#define DIRECTORY_SEPARATOR "/"
 
 #define EPSILON 0.05
 
