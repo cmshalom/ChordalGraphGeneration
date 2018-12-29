@@ -11,6 +11,11 @@
 #include <fstream>
 #include <time.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+
 using namespace std;
 
 Chordal::Chordal(int n, double densityMult) {

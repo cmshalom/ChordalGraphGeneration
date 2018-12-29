@@ -42,8 +42,7 @@ double Stats::getAverage() const {
 
 double Stats::getVariance() const {
 	double avg = getAverage();
-	return (sumSquares - count*avg*avg)/count;
-	// OYLUM: Variance formulunu konusalim
+	return sumSquares/count - avg*avg;
 }
 
 double Stats::getStdDev() const {

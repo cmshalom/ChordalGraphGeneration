@@ -5,7 +5,7 @@
 #include "Seeder.h"
 #include "Chordal.h"
 
-#ifdef WINDOWS
+#ifdef _WIN32
 #include <windows.h>
 #include <direct.h>
 #define mkdir(a,b) _mkdir(a)
