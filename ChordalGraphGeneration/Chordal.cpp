@@ -125,7 +125,7 @@ void Chordal::collectAndWriteStats(string fileName, string instanceInfoCSVFileNa
 	file.open(instanceInfoCSVFileName, ios::out | ios::ate | ios::app);
 
 	file << fileName << "," << n << "," << density << "," << densityMult << ","
-		<< numConnComps << "," << stats << "," << timeToBuild << endl;
+		<< numConnComps << "," << *stats << "," << timeToBuild << endl;
 	file.close();
 
 	ofstream file2;
