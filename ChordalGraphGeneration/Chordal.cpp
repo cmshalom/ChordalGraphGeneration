@@ -55,7 +55,7 @@ int Chordal::numberOfNewSubtrees(void) {
 	// return rand() % (n - numSubtrees) + 1;
 	return rand() % (max(1, int( (n - numSubtrees)*densityMult + 0.5 ))) + 1;
 #else
-	int k = 1;
+	unsigned int k = 1;
 	while (k < n - numSubtrees) {
 		unsigned int randomInt = rand();
 		double randomNo = (double)randomInt / RAND_MAX;
