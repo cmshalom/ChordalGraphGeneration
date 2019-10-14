@@ -29,6 +29,7 @@ private:
 
 	int newNode(void);
 	void addTreeEdge(int parent, int child);
+	int numberOfNewSubtrees(void);
 
 
 public:

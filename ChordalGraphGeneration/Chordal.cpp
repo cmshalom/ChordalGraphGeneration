@@ -49,12 +49,31 @@ void Chordal::generate(void) {
 	timeToBuild = double(end - start) / 1000;
 }
 
+int Chordal::numberOfNewSubtrees(void) {
+#ifdef S_CHOSEN_UNIFORMLY
+	// Note that when densityMult=1 the below becomes
+	// return rand() % (n - numSubtrees) + 1;
+	return rand() % (max(1, int( (n - numSubtrees)*densityMult + 0.5 ))) + 1;
+#else
+	int k = 1;
+	while (k < n - numSubtrees) {
+		unsigned int randomInt = rand();
+		double randomNo = (double)randomInt / RAND_MAX;
+		if (randomNo < 0.5 * densityMult) {
+			// The probability to obtain a bigger number increases
+			// with densityMult
+			k++;
+		} else {
+			break;
+		}
+	}
+	return k;
+#endif
+}
+
 int Chordal::newNode(void) {
 	lastNodeID++;
-	// Note that when densityMult=1 the below becomes
-	// int k = rand() % (n - numSubtrees) + 1;
-	int k = rand() % (max(1, int( (n - numSubtrees)*densityMult + 0.5 ))) + 1;
-
+	int k = numberOfNewSubtrees();
 	//update the set of subtrees containing u
 	subtreesContaining.resize(lastNodeID+1);
 	for (int i = 0; i < k; i++)
