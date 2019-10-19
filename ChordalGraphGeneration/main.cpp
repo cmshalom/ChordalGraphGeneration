@@ -23,6 +23,12 @@
 
 #define EPSILON 0.05
 
+#ifdef S_CHOSEN_UNIFORMLY
+#define DENSITY_MULT_MAX 1
+#else
+#define DENSITY_MULT_MAX 2
+#endif
+
 using namespace std;
 
 int n;                      // Parameter #1: Number of vertices
@@ -34,6 +40,7 @@ double densityMult; 	    // Parameter #4: Density multiplier, which is an option
 static void readArguments(int argc, char ** argv) {
 	if (argc < 4 || argc > 5) {
 		cerr << "Usage: " << argv[0] << " number_of_vertices desired_density graph_index [density_multiplier]" << endl;
+		cerr << "desired density = 0 means that no density is imposed by the user" << endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -47,7 +54,7 @@ static void readArguments(int argc, char ** argv) {
 	desiredDensity = stod(argv[2]);
 	if (desiredDensity > 1 || desiredDensity < 0)
 	{
-		cout << "Desired density should be between 0 and 1!" << endl;
+		cout << "Desired density should be between 0 and 1 !" << endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -57,9 +64,9 @@ static void readArguments(int argc, char ** argv) {
 	if (argc == 5)
 	{
 		densityMult = stod(argv[4]);
-		if (densityMult > 1 || densityMult < 0)
+		if (densityMult > DENSITY_MULT_MAX || densityMult < 0)
 		{
-			cout << "Density control parameter should be between 0 and 1!" << endl;
+			cout << "Density control parameter should be between 0 and " << DENSITY_MULT_MAX << endl;
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -76,9 +83,11 @@ int main(int argc, char ** argv) {
 	rp.seedRand();
 
 	Chordal chg (n, densityMult);
-	while (abs(chg.getDensity() - desiredDensity) > densityEps) {
-		cerr << "Bad density: " << chg.getDensity() << " instead of " << desiredDensity << endl;
-		chg.generate();
+	if (desiredDensity != 0) {
+		while (abs(chg.getDensity() - desiredDensity) > densityEps) {
+			cerr << "Bad density: " << chg.getDensity() << " instead of " << desiredDensity << endl;
+			chg.generate();
+		}
 	}
 
 	// WRITE THE CHORDAL GRAPH TO FILE
